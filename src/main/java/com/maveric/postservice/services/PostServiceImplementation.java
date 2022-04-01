@@ -54,6 +54,7 @@ public class PostServiceImplementation implements PostService{
 
 
 
+
     @Override
     public PostResponse getPostDetails(String postId) {
         Post post=postRepo.findBypostId(postId);
@@ -68,5 +69,23 @@ public class PostServiceImplementation implements PostService{
     @Override
     public PostResponse createPost(Postdto postdto) {
         Post posts=new Post();
+        posts.setCreatedAt(LocalDate.now());
+        posts.setUpdatedAt(LocalDate.now());
+        posts.setPost(postdto.getPost());
+        posts.setPostedBy(postdto.getPostedBy());
+        Post post=postRepo.save(posts);
+        log.info("post created successfully");
+        return new PostResponse(post.getPostId(), post.getPost(),
+                userFeign.getUsersById(post.getPostedBy()).getBody(),
+                0, 0
+                , post.getCreatedAt(), post.getUpdatedAt());
+    }
+	
+	 public PostResponse setPostResponse(Post post) {
+        return new PostResponse(post.getPostId(), post.getPost(),
+                userFeign.getUsersById(post.getPostedBy()).getBody(),
+                likefeign.getLikesCount(post.getPostId()).getBody(), commentfeign.getCommentsCount(post.getPostId()).getBody()
+                , post.getCreatedAt(), post.getUpdatedAt());
+    }
    
 }

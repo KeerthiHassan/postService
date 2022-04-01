@@ -29,7 +29,6 @@ public class PostController {
         return new ResponseEntity<List<PostResponse>> (postService.getPosts(), HttpStatus.OK);
     }
 
-  
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<PostResponse> getPostDetails(@PathVariable ("postId") String postId){
