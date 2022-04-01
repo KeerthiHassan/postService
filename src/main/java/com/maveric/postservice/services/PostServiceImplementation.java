@@ -54,6 +54,7 @@ public class PostServiceImplementation implements PostService{
 
 
 
+
     @Override
     public PostResponse getPostDetails(String postId) {
         Post post=postRepo.findBypostId(postId);
@@ -65,10 +66,7 @@ public class PostServiceImplementation implements PostService{
         return setPostResponse(post);
     }
 
-    @Override
-    public PostResponse createPost(Postdto postdto) {
-        Post posts=new Post();
-		
+    
 		@Override
     public String deletePost(String postId) {
     if(postRepo.findBypostId(postId)==null){
@@ -79,6 +77,47 @@ public class PostServiceImplementation implements PostService{
         log.info("post deleted successfully");
         return "Post deleted successfully";
     }
-   
+  
+   @Override
+    public PostResponse createPost(Postdto postdto) {
+        Post posts=new Post();
+        posts.setCreatedAt(LocalDate.now());
+        posts.setUpdatedAt(LocalDate.now());
+        posts.setPost(postdto.getPost());
+        posts.setPostedBy(postdto.getPostedBy());
+        Post post=postRepo.save(posts);
+        log.info("post created successfully");
+        return new PostResponse(post.getPostId(), post.getPost(),
+                userFeign.getUsersById(post.getPostedBy()).getBody(),
+                0, 0
+                , post.getCreatedAt(), post.getUpdatedAt());
+    }
+	
+	@Override
+    public PostResponse updatePost(String postId, Postdto updatePost) {
+        Post posts=postRepo.findBypostId(postId);
+        if(posts==null){
+            log.info("post not found");
+            throw new PostsNotPresent("Can't post,post not avilable");
+        }
+        if(!(posts.getPostedBy().equals(updatePost.getPostedBy()))){
+            log.info("Post not belongs to you");
+            throw new PostCannotbeUpdated("You can't update this post");
+        }
+        posts.setUpdatedAt(LocalDate.now());
+        posts.setPostedBy(updatePost.getPostedBy());
+        posts.setPost(updatePost.getPost());
+        log.info("Updating post");
+        return setPostResponse(postRepo.save(posts));
+    }
+
+	
+	 public PostResponse setPostResponse(Post post) {
+        return new PostResponse(post.getPostId(), post.getPost(),
+                userFeign.getUsersById(post.getPostedBy()).getBody(),
+                likefeign.getLikesCount(post.getPostId()).getBody(), commentfeign.getCommentsCount(post.getPostId()).getBody()
+                , post.getCreatedAt(), post.getUpdatedAt());
+    }
+
    
 }

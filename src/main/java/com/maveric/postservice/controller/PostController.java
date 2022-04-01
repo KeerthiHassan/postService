@@ -28,7 +28,18 @@ public class PostController {
         log.info("getting post");
         return new ResponseEntity<List<PostResponse>> (postService.getPosts(), HttpStatus.OK);
     }
+	
+	@PutMapping("/posts/{postId}")
+    public ResponseEntity<PostResponse> updatePost(@PathVariable ("postId") String postId,@Valid @RequestBody Postdto updatePost){
+        log.info("Updating post");
+        return new ResponseEntity<PostResponse>(postService.updatePost(postId,updatePost),HttpStatus.OK);
+    }
 
+@PostMapping("/posts")
+    public ResponseEntity<PostResponse> createPost(@Valid  @RequestBody Postdto postdto){
+        log.info("Creating post");
+        return new ResponseEntity<PostResponse>(postService.createPost(postdto),HttpStatus.CREATED);
+    }
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<PostResponse> getPostDetails(@PathVariable ("postId") String postId){
