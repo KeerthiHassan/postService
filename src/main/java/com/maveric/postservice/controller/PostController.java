@@ -24,9 +24,9 @@ public class PostController {
     PostService postService;
 
     @GetMapping("/posts")
-    public ResponseEntity<List<PostResponse>> getPosts(){
+    public ResponseEntity<List<PostResponse>> getPosts(@QueryParam("page") Integer page, @QueryParam("size") Integer size){
         log.info("getting post");
-        return new ResponseEntity<List<PostResponse>> (postService.getPosts(), HttpStatus.OK);
+        return new ResponseEntity<List<PostResponse>> (postService.getPosts(page,size), HttpStatus.OK);
     }
 	
 	@PutMapping("/posts/{postId}")

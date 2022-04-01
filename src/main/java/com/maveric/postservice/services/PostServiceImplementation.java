@@ -36,9 +36,10 @@ public class PostServiceImplementation implements PostService{
     UserFeign userFeign;
 @LoadBalanced
     @Override
-    public List<PostResponse> getPosts() {
-    
-    List<Post> postList=postRepo.findAll();
+    public List<PostResponse> getPosts(Integer page, Integer size) {
+    ageable pageable= PageRequest.of(page,size);
+    List<Post> postList=postRepo.findAll(pageable).toList();
+	
         if(postList==null) {
             log.info("posts not found");
             throw new PostsNotPresent("Not able to fetch any post");
