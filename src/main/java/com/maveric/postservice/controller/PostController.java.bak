@@ -29,6 +29,7 @@ public class PostController {
         return new ResponseEntity<List<PostResponse>> (postService.getPosts(), HttpStatus.OK);
     }
 
+
 @PostMapping("/posts")
     public ResponseEntity<PostResponse> createPost(@Valid  @RequestBody Postdto postdto){
         log.info("Creating post");

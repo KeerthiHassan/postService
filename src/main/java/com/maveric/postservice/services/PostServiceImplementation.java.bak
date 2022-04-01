@@ -66,7 +66,19 @@ public class PostServiceImplementation implements PostService{
         return setPostResponse(post);
     }
 
-    @Override
+    
+		@Override
+    public String deletePost(String postId) {
+    if(postRepo.findBypostId(postId)==null){
+        log.info("post not found");
+        throw new PostsNotPresent("Can't delete post,post not present");
+    }
+        postRepo.deleteById(postId);
+        log.info("post deleted successfully");
+        return "Post deleted successfully";
+    }
+  
+   @Override
     public PostResponse createPost(Postdto postdto) {
         Post posts=new Post();
         posts.setCreatedAt(LocalDate.now());
@@ -81,11 +93,31 @@ public class PostServiceImplementation implements PostService{
                 , post.getCreatedAt(), post.getUpdatedAt());
     }
 	
+	@Override
+    public PostResponse updatePost(String postId, Postdto updatePost) {
+        Post posts=postRepo.findBypostId(postId);
+        if(posts==null){
+            log.info("post not found");
+            throw new PostsNotPresent("Can't post,post not avilable");
+        }
+        if(!(posts.getPostedBy().equals(updatePost.getPostedBy()))){
+            log.info("Post not belongs to you");
+            throw new PostCannotbeUpdated("You can't update this post");
+        }
+        posts.setUpdatedAt(LocalDate.now());
+        posts.setPostedBy(updatePost.getPostedBy());
+        posts.setPost(updatePost.getPost());
+        log.info("Updating post");
+        return setPostResponse(postRepo.save(posts));
+    }
+
+	
 	 public PostResponse setPostResponse(Post post) {
         return new PostResponse(post.getPostId(), post.getPost(),
                 userFeign.getUsersById(post.getPostedBy()).getBody(),
                 likefeign.getLikesCount(post.getPostId()).getBody(), commentfeign.getCommentsCount(post.getPostId()).getBody()
                 , post.getCreatedAt(), post.getUpdatedAt());
     }
+
    
 }
