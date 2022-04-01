@@ -68,5 +68,17 @@ public class PostServiceImplementation implements PostService{
     @Override
     public PostResponse createPost(Postdto postdto) {
         Post posts=new Post();
+		
+		@Override
+    public String deletePost(String postId) {
+    if(postRepo.findBypostId(postId)==null){
+        log.info("post not found");
+        throw new PostsNotPresent("Can't delete post,post not present");
+    }
+        postRepo.deleteById(postId);
+        log.info("post deleted successfully");
+        return "Post deleted successfully";
+    }
+   
    
 }
