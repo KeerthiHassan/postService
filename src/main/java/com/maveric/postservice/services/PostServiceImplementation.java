@@ -81,6 +81,25 @@ public class PostServiceImplementation implements PostService{
                 , post.getCreatedAt(), post.getUpdatedAt());
     }
 	
+	@Override
+    public PostResponse updatePost(String postId, Postdto updatePost) {
+        Post posts=postRepo.findBypostId(postId);
+        if(posts==null){
+            log.info("post not found");
+            throw new PostsNotPresent("Can't post,post not avilable");
+        }
+        if(!(posts.getPostedBy().equals(updatePost.getPostedBy()))){
+            log.info("Post not belongs to you");
+            throw new PostCannotbeUpdated("You can't update this post");
+        }
+        posts.setUpdatedAt(LocalDate.now());
+        posts.setPostedBy(updatePost.getPostedBy());
+        posts.setPost(updatePost.getPost());
+        log.info("Updating post");
+        return setPostResponse(postRepo.save(posts));
+    }
+
+	
 	 public PostResponse setPostResponse(Post post) {
         return new PostResponse(post.getPostId(), post.getPost(),
                 userFeign.getUsersById(post.getPostedBy()).getBody(),

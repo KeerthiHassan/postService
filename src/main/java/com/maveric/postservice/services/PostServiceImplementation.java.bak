@@ -80,6 +80,7 @@ public class PostServiceImplementation implements PostService{
                 0, 0
                 , post.getCreatedAt(), post.getUpdatedAt());
     }
+	
 	 public PostResponse setPostResponse(Post post) {
         return new PostResponse(post.getPostId(), post.getPost(),
                 userFeign.getUsersById(post.getPostedBy()).getBody(),
